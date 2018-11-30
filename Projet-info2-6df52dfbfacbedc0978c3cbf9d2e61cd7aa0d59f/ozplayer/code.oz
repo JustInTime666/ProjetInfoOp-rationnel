@@ -26,10 +26,15 @@ local
 		 sharp:false
 		 duration:1.0
 		 instrument: none)
+	 [] [N O T] then
+	    note(name:{StringToAtom [N]}
+		 octave:{StringToInt [O T]}
+		 sharp:false
+		 duration:1.0
+		 instrument: none) %pour le cas d'octave 10
 	 end
       end
    end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -51,9 +56,7 @@ local
   %retourne la partition prise en argument avec comme duree totale Secondes (en sec.)
    %Secondes doit etre un float sinon la comparaison Somme==Secondes plante.
    fun {Duration Secondes Partition} % /!\ doit retourner un liste qu'on va append!!!!
-      local
-	 Facteur
-	 Somme
+      local Facteur Somme
 	 fun {Parcours Partition Acc}%additionne tout les temps
 	    case Partition of H|T then %etape2:on parcourt la timedList afin de savoir la duree initale de la partition
 	       if {List.is H} then {Parcours T Acc+H.1.duration}%une chord ne se joue qu'en 1temps, je prends donc un temps dans le chord
@@ -104,7 +107,7 @@ local
   % %-------------------------------------------------------------------------------
 
   % renvoie une liste avec la note repetee autant de fois que la quantite indiquee par ​amount​.
-    % testé et approuvé
+    % teste et approuve
    fun {Drone Note Amount}
       local DroneAcc in 
 	 fun{DroneAcc Note Amount Acc L}
@@ -158,11 +161,11 @@ local
 	    else nil
 	    end
 	 end
-	 fun{GetNumber Note} % renvoie le nombre associé à une note
+	 fun{GetNumber Note} % renvoie le nombre associe a une note
 	    if {GetRow Note} == O then O else
 	       ((Note.octave + 2) * ({GetRow Note} + 11)) - 12 end
 	 end
-	 fun{GetNote X} % renvoie la note correspondant à un chiffre (cfr tableau wiki)
+	 fun{GetNote X} % renvoie la note correspondant a un chiffre (cfr tableau wiki)
 	    local GetNote1 GetNote2 A B in
 	       A = X mod 12 % ligne
 	       fun{GetNote1 X}
@@ -283,7 +286,7 @@ local
 	    local F in
 	       if {GetNumber Note} == 0 then I=I+1 {Append 0 {Partition T}}
 	       else
-		  F = (2**(({GetNumber Note}-69)/12) )*440
+		  F = {Pow 2 ({GetNumber Note}-69)/12)} *440
 		  I=I+1
 		  {Append 1/2*Sin((2*3.14159265359*F*I)/44100) {Partition T}}
 	       end
@@ -368,7 +371,7 @@ local
    fun{Loop Seconds Musi}
       local
 	 MusiT={Music Musi}
-	 fun {Loo Sec Mus MusiT}
+	 fun {Loo Sec Musi MusiT}
 	    case Mus of H|T then
 	       if Sec-1.0/44100.0 >= 0.0 then H|{Loo Sec-1.0/44100.0 T MusiT}
 	       else nil
@@ -379,7 +382,8 @@ local
       in
 	 {Loo Seconds MusiT MusiT}
       end
-   end %teste avec {Browse {Loop 3.1/44100.0 [1 2]}} (si on met 3.0, ne sort pas le 3ème à cause de l'approx)
+   end
+%{Browse {Loop 3.1/44100.0 [1 2]}} (si on met 3.0, ne sort pas le 3ème à cause de l'approx)
 
 
  %-------------------------------------------------------------------------------
